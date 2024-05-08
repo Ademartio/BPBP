@@ -13,15 +13,9 @@
  **********************************************************************************************************************/
 
 #include <iostream>
-#include <vector>
-#include <tuple>
 #include <algorithm>
 
-// Pybind11 header libraries
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
-
-namespace py = pybind11;
+#include "kruskal_on_hypergraph.h"
 
 // For debug purposes
 void printMatrix(const std::vector<std::vector<bool>>& matrix) {
@@ -40,7 +34,6 @@ static std::vector<std::vector<bool>> conditionMatrix(std::vector<std::vector<bo
    const size_t hog_cols = (hog_rows > 0) ? hog[0].size() : 0;
 
    std::vector<std::vector<bool>> H(hog_cols, std::vector<bool>(hog_rows + 2));
-   //H.resize(hog_rows + 2, std::vector<bool>(hog_cols, 0));
 
    for (size_t i = 0; i < hog_cols; i++)
    {
@@ -215,26 +208,17 @@ std::tuple<std::vector<std::vector<bool>>, std::vector<size_t>>
 
    std::vector<size_t> cluster_array(H_T[0].size(), 0);
    size_t cluster_number = 1U;
-   size_t column_number = 1U; // why starts at 1?
+   size_t column_number = 1U;
 
    H_square_T.push_back(H_T[0]);
    setClusters(H_T[0], cluster_array, cluster_number);
    cluster_number++;
-   // printf("Conditioned H_T:\n");
-   // printMatrix(H_T);
 
    for (size_t i = 1; i < hog_cols; i++)
    {
       std::vector<bool> const & row = H_T[i];
 
       std::vector<size_t> non_zero_clstr_vals = getRowNonZeroValues(row, cluster_array);
-      // printf("Non-zero values for cluster array and row #%lu:\n", i);
-      // if (non_zero_clstr_vals.empty())
-      //    printf("  No values...");
-      // else
-      //    for (size_t j = 0; j < non_zero_clstr_vals.size(); ++j)
-      //       printf("%lu ", non_zero_clstr_vals[j]);
-      // printf("\n");
 
       if (non_zero_clstr_vals.empty())
       {
@@ -272,8 +256,3 @@ std::tuple<std::vector<std::vector<bool>>, std::vector<size_t>>
    return std::make_tuple(H_square, column_to_square);
 }
 
-// Bindings for the printMatrix function
-PYBIND11_MODULE(bpbp, bpbp) {
-   bpbp.def("print_matrix", &printMatrix, "A function to print a matrix");
-   bpbp.def("kruskal_on_hypergraph", &kruskal_on_hypergraph, "A very nice function");
-}
