@@ -15,68 +15,83 @@
 
 #include "DisjointSet.h"
 
-DisjSet::DisjSet(int n) 
-{ 
-   rank = new int[n]; 
-   parent = new int[n]; 
-   this->n = n; 
-   make_set(); 
-} 
+DisjSet::DisjSet(int const & n) 
+{
+   rank = new int[n];
+   parent = new int[n];
+   this->n = n;
+   make_set();
+}
 
-// Creates n single item sets 
-void DisjSet::make_set() 
-{ 
-   for (int i = 0; i < n; i++) { 
-      parent[i] = i; 
-   } 
-} 
+// Creates n single item sets
+void DisjSet::make_set()
+{
+   for (int i = 0; i < n; i++) {
+      parent[i] = i;
+   }
+}
 
-// Finds set of given item x 
-int DisjSet::find(int x) 
-{ 
-   // Finds the representative of the set 
-   // that x is an element of 
-   if (parent[x] != x) { 
+// Finds set of given item x
+int DisjSet::find(int const & x)
+{
+   // Finds the representative of the set
+   // that x is an element of
+   if (parent[x] != x) {
 
-      // if x is not the parent of itself 
-      // Then x is not the representative of 
-      // his set, 
-      parent[x] = find(parent[x]); 
+      // if x is not the parent of itself
+      // Then x is not the representative of
+      // his set,
+      parent[x] = find(parent[x]);
 
-      // so we recursively call Find on its parent 
-      // and move i's node directly under the 
-      // representative of this set 
-   } 
+      // so we recursively call Find on its parent
+      // and move i's node directly under the
+      // representative of this set
+   }
 
-   return parent[x]; 
-} 
+   return parent[x];
+}
 
-// Do union of two sets by rank represented 
-// by x and y. 
-void DisjSet::set_union(int x, int y) 
-{ 
-   // Find current sets of x and y 
-   int xset = find(x); 
-   int yset = find(y); 
+void DisjSet::set_parent(int const & x, int const & new_parent)
+{
+   parent[x] = new_parent;
+}
 
-   // If they are already in same set 
-   if (xset == yset) 
-      return; 
+int DisjSet::get_rank(int const & x)
+{
+   return rank[x];
+}
 
-   // Put smaller ranked item under 
-   // bigger ranked item if ranks are 
-   // different 
-   if (rank[xset] < rank[yset]) { 
-      parent[xset] = yset; 
-   } 
-   else if (rank[xset] > rank[yset]) { 
-      parent[yset] = xset; 
-   } 
+void DisjSet::increase_rank(int const & x)
+{
+   rank[x] += 1;
+}
 
-   // If ranks are same, then increment 
-   // rank. 
-   else { 
-      parent[yset] = xset; 
-      rank[xset] = rank[xset] + 1; 
-   } 
+// Do union of two sets by rank represented
+// by x and y.
+void DisjSet::set_union(int const & x, int const & y)
+{
+   // Find current sets of x and y
+   int xset = find(x);
+   int yset = find(y);
+
+   // If they are already in same set
+   if (xset == yset)
+      return;
+
+   // Put smaller ranked item under
+   // bigger ranked item if ranks are
+   // different
+   if (rank[xset] < rank[yset]) {
+      parent[xset] = yset;
+   }
+   else if (rank[xset] > rank[yset]) {
+      parent[yset] = xset;
+   }
+
+   // If ranks are same, then increment
+   // rank.
+   else {
+      parent[yset] = xset;
+      rank[xset] = rank[xset] + 1;
+   }
 }

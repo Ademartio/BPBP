@@ -25,17 +25,26 @@ class DisjSet
    public: 
       // Constructor to create and 
       // initialize sets of n items 
-      DisjSet(int n);
+      DisjSet(int const & n);
 
       // Creates n single item sets 
       void make_set();
 
       // Finds set of given item x 
-      int find(int x);
+      int find(int const & x);
+
+      // Sets the parent of element x to new_parent.
+      void set_parent(int const & x, int const & new_parent);
+
+      // Returns the rank associated with the x value.
+      int get_rank(int const & x);
+
+      // Increases by 1 the rank of the element x.
+      void increase_rank(int const & x);
 
       // Do union of two sets by rank represented 
       // by x and y. 
-      void set_union(int x, int y);
+      void set_union(int const & x, int const & y);
 };
 
 #endif // DISJOINT_SET_H_

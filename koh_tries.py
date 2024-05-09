@@ -72,8 +72,8 @@ def kruskal_on_hypergraph(Hog):
     
     H_square = H[:,column_to_square.astype(int)]
 
-    print("H_square is:")
-    print(H_square.astype(int))
+    #print("H_square is:")
+    #print(H_square.astype(int))
     
     empty_column = np.zeros((H_square.shape[0], 1))  # Create an empty column filled with zeros
     matrix_with_empty_column = np.hstack((H_square, empty_column))
@@ -100,9 +100,17 @@ np_mat = np.array(matrix)
 
 H, col = bpbp.kruskal_on_hypergraph(np_mat)
 
-print("\nAfter bpbp:")
+print("\nAfter kruskis:")
 bpbp.print_matrix(H)
-print("\nThe column of the tupple:")
+print("\nThe column of the tupple with kruskis:")
+#col = [col] # Make a list of only one list to be able to print it hehe
+print(col)
+
+H, col = bpbp.uf_kruskal_on_hypergraph(np_mat)
+
+print("\nAfter uf_kruskis:")
+bpbp.print_matrix(H)
+print("\nThe column of the tupple with uf_kruskis:")
 #col = [col] # Make a list of only one list to be able to print it hehe
 print(col)
 

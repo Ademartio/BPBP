@@ -93,7 +93,7 @@ class UF:
         returned_H = H_sorted[:-2,indices_columns_chosen]
         new_rows, new_cols = returned_H.shape
         if new_rows >= new_cols:
-            returned_H = np.hstack((returned_H,np.zeros((new_cols, new_rows-new_cols+1))))
+            returned_H = np.hstack((returned_H,np.zeros((new_rows, new_rows-new_cols+1))))
         return returned_H, indices_columns_chosen
                 
     def decode(self, syndrome : np.array):

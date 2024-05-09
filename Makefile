@@ -7,6 +7,7 @@ MOD_EXT_SUFIX	:= $(shell python3-config --extension-suffix)
 PY_LIBS			:= $(shell python3-config --ldflags)
 SRCS				:= src/kruskal_on_hypergraph.cpp \
 						src/DisjointSet.cpp \
+						src/uf_kruskal_on_hypergraph.cpp \
 						src/py11_iface.cpp \
 
 ENVIRONMENT := $(shell uname -s | sed -E 's/^([^-]*).*$$/\1/g')
