@@ -2,7 +2,7 @@ import numpy as np
 from ldpc import bp_decoder
 import copy
 
-
+from module import bpbp
 
 
 class UF:
@@ -35,6 +35,8 @@ class UF:
                     self.Hog[-2,i] = 1
                 else:
                     self.Hog[-1,i] = 1
+
+        self.Hog = self.Hog.transpose()
     
     def SetCluster(self):
         """Set the clusters which will be grown via Union Find.
@@ -50,9 +52,14 @@ class UF:
     
     
     def sort_matrix(self, llrs):
-        sorted_indices = np.argsort(llrs)
-        H_sorted = self.Hog[:,sorted_indices]
-        return H_sorted, sorted_indices
+        #sorted_indices = np.argsort(llrs)
+        c_sorted = bpbp.sort_llrs(llrs)
+        #H_sorted = self.Hog[:,sorted_indices]
+        # Ahora la he traspuesto asi que sería al reves
+        #H_sorted = self.Hog[sorted_indices,:]
+        # Ahora con c_sorted
+        H_sorted = self.Hog[c_sorted,:]
+        return H_sorted, np.array(c_sorted)#sorted_indices
     
     def Find(self, x :int, cluster_array = np.array):
         while x != cluster_array[x,0]:
@@ -62,6 +69,12 @@ class UF:
     # def Union(self, elements:list):
     #     pass
     
+    def Kruskal_hypergraph_iet(self, H_sorted):
+        returned_H, indices_columns_chosen = bpbp.uf_kruskal_on_hypergraph(H_sorted)
+        returned_H = np.array(returned_H).astype(int)
+        indices_columns_chosen = np.array(indices_columns_chosen)
+        return returned_H, indices_columns_chosen
+
     def Kruskal_hypergraph(self, H_sorted: np.ndarray):
         cluster_array = self.SetCluster()
         columns_chosen = np.zeros(self.columns, dtype = int)
@@ -105,11 +118,12 @@ class UF:
         
         llrs = self._bpd.log_prob_ratios
         H_sorted, sorted_indices = self.sort_matrix(llrs)
-        H_squared, columns_chosen = self.Kruskal_hypergraph(H_sorted)
+        #H_squared, columns_chosen = self.Kruskal_hypergraph(H_sorted)
+        H_squared, columns_chosen = self.Kruskal_hypergraph_iet(H_sorted)
         
         _bpd_squared = bp_decoder(
             H_squared,
-            error_rate=self.p,
+            error_rate=self.p
         )
         
         second_recovered_error = _bpd_squared.decode(syndrome)

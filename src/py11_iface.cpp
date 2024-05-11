@@ -12,4 +12,5 @@ PYBIND11_MODULE(bpbp, bpbp) {
    bpbp.def("print_matrix", &printMatrix, "A function to print a matrix");
    bpbp.def("kruskal_on_hypergraph", &kruskal_on_hypergraph, "A very nice function");
    bpbp.def("uf_kruskal_on_hypergraph", &uf_kruskal_on_hypergraph, "Another very nice function");
+   bpbp.def("sort_llrs", &sort_llrs, "Beautiful function");
 }

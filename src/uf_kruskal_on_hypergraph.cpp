@@ -14,16 +14,38 @@
 
 #include <algorithm>
 #include <iostream>
+#include <numeric>
 
 #include "uf_kruskal_on_hypergraph.h"
 #include "DisjointSet.h"
+
+template <typename T>
+static std::vector<size_t> sort_indexes(std::vector<T> const &v) {
+
+  // initialize original index locations
+   std::vector<size_t> idx(v.size());
+   std::iota(idx.begin(), idx.end(), 0);
+
+  // sort indexes based on comparing values in v
+  // using std::stable_sort instead of std::sort
+  // to avoid unnecessary index re-orderings
+  // when v contains elements of equal values 
+   std::sort(idx.begin(), idx.end(), 
+                     [&v](size_t i1, size_t i2) 
+                     {
+                        return v[i1] < v[i2];
+                        }
+                  );
+
+   return idx;
+}
 
 static std::vector<std::vector<bool>> conditionMatrix(std::vector<std::vector<bool>>const & hog)
 {
    const size_t hog_rows = hog.size();
    const size_t hog_cols = (hog_rows > 0) ? hog[0].size() : 0;
 
-   std::vector<std::vector<bool>> H(hog_cols, std::vector<bool>(hog_rows + 2));
+   std::vector<std::vector<bool>> H(hog_cols, std::vector<bool>(hog_rows, 0));
 
    for (size_t i = 0; i < hog_cols; i++)
    {
@@ -31,29 +53,29 @@ static std::vector<std::vector<bool>> conditionMatrix(std::vector<std::vector<bo
       for (size_t j = 0; j < hog_rows; j++)
       {
          H[i][j] = hog[j][i];
-         if (hog[j][i] == 1)
-         {
-            ones_idx.push_back(j);
-         }
+         // if (hog[j][i] == 1)
+         // {
+         //    ones_idx.push_back(j);
+         // }
       }
 
-      if (ones_idx.size() == 1)
-      {
-         // We do not care about integer division, in fact, we take advantage
-         // of it, because we want to floor the result. We save the extra cost
-         // of calling the std::floor routine because hog_rows and the index value
-         // will always be positive, so the truncation towards 0 is the same as
-         // flooring.
-         if (ones_idx[0] < hog_rows / 2)
-         {
-            H[i][hog_rows] = 1;
-         }
-         else
-         {
-            H[i][hog_rows+1] = 1;
-         }
-         ones_idx.clear();
-      }
+      // if (ones_idx.size() == 1)
+      // {
+      //    // We do not care about integer division, in fact, we take advantage
+      //    // of it, because we want to floor the result. We save the extra cost
+      //    // of calling the std::floor routine because hog_rows and the index value
+      //    // will always be positive, so the truncation towards 0 is the same as
+      //    // flooring.
+      //    if (ones_idx[0] < hog_rows / 2)
+      //    {
+      //       H[i][hog_rows] = 1;
+      //    }
+      //    else
+      //    {
+      //       H[i][hog_rows+1] = 1;
+      //    }
+      //    ones_idx.clear();
+      // }
    }
 
    return H;
@@ -96,10 +118,14 @@ static std::vector<std::vector<bool>> formatResult(std::vector<std::vector<bool>
 
    if (cols_T >= rows_T)
    {
-      std::cout << "Entra en el truco del almendruco\n";
       size_t rows_to_add = cols_T - rows_T + 1;
       std::vector<std::vector<bool>> tmp_vectors(rows_to_add, std::vector<bool>(cols_T, 0));
       H_square_T.insert(H_square_T.end(), tmp_vectors.begin(), tmp_vectors.end());
+      // std::vector<bool> tmp_row(cols_T, 0);
+      // for (size_t i = 0; i < rows_to_add; i++)
+      // {
+      //    H_square_T.push_back(tmp_row);
+      // }
       rows_T += rows_to_add;
    }
 
@@ -126,7 +152,8 @@ std::tuple<std::vector<std::vector<bool>>, std::vector<size_t>>
    std::vector<size_t> columns_chosen;
    std::vector<std::vector<bool>> H_square_T;
 
-   std::vector<std::vector<bool>> H_T = conditionMatrix(hog);
+   //std::vector<std::vector<bool>> H_T = conditionMatrix(hog);
+   std::vector<std::vector<bool>> const & H_T = hog;
 
    DisjSet clstr_set = DisjSet(hog_rows+2);
 
@@ -183,4 +210,9 @@ std::tuple<std::vector<std::vector<bool>>, std::vector<size_t>>
    std::vector<std::vector<bool>> H_square = formatResult(H_square_T);
 
    return std::make_tuple(H_square, columns_chosen);
+}
+
+std::vector<size_t> sort_llrs(std::vector<double> const & llrs)
+{
+   return sort_indexes(llrs);
 }
