@@ -15,10 +15,10 @@
 
 #include "DisjointSet.h"
 
-DisjSet::DisjSet(int const & n) 
+DisjSet::DisjSet(unsigned long const & n) 
 {
    rank = new int[n];
-   parent = new int[n];
+   parent = new unsigned long[n];
    this->n = n;
    make_set();
 }
@@ -26,13 +26,13 @@ DisjSet::DisjSet(int const & n)
 // Creates n single item sets
 void DisjSet::make_set()
 {
-   for (int i = 0; i < n; i++) {
+   for (unsigned long i = 0; i < n; i++) {
       parent[i] = i;
    }
 }
 
 // Finds set of given item x
-int DisjSet::find(int const & x)
+unsigned long DisjSet::find(unsigned long const & x)
 {
    // Finds the representative of the set
    // that x is an element of
@@ -51,28 +51,28 @@ int DisjSet::find(int const & x)
    return parent[x];
 }
 
-void DisjSet::set_parent(int const & x, int const & new_parent)
+void DisjSet::set_parent(unsigned long const & x, unsigned long const & new_parent)
 {
    parent[x] = new_parent;
 }
 
-int DisjSet::get_rank(int const & x)
+int DisjSet::get_rank(unsigned long const & x)
 {
    return rank[x];
 }
 
-void DisjSet::increase_rank(int const & x)
+void DisjSet::increase_rank(unsigned long const & x)
 {
    rank[x] += 1;
 }
 
 // Do union of two sets by rank represented
 // by x and y.
-void DisjSet::set_union(int const & x, int const & y)
+void DisjSet::set_union(unsigned long const & x, unsigned long const & y)
 {
    // Find current sets of x and y
-   int xset = find(x);
-   int yset = find(y);
+   unsigned long xset = find(x);
+   unsigned long yset = find(y);
 
    // If they are already in same set
    if (xset == yset)
