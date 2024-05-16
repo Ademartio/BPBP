@@ -19,32 +19,36 @@ class DisjSet
 {
    private:
       int *rank;
-      unsigned long *parent;
-      unsigned long n; 
+      long int *parent;
+      long int n; 
 
    public: 
       // Constructor to create and 
       // initialize sets of n items 
-      DisjSet(unsigned long const & n);
+      DisjSet(long int const & n);
 
       // Creates n single item sets 
       void make_set();
 
       // Finds set of given item x 
-      unsigned long find(unsigned long const & x);
+      long int find(long int const & x);
 
       // Sets the parent of element x to new_parent.
-      void set_parent(unsigned long const & x, unsigned long const & new_parent);
+      void set_parent(long int const & x, long int const & new_parent);
 
       // Returns the rank associated with the x value.
-      int get_rank(unsigned long const & x);
+      int get_rank(long int const & x);
 
       // Increases by 1 the rank of the element x.
-      void increase_rank(unsigned long const & x);
+      void increase_rank(long int const & x);
 
       // Do union of two sets by rank represented 
       // by x and y. 
-      int set_union(unsigned long const & x, unsigned long const & y);
+      int set_union(long int const & x, long int const & y);
+
+      // Do the union of two sets by rank in a UF manner
+      long int set_union_opt(long int const & parent, 
+                              long int const & candidate);
 };
 
 #endif // DISJOINT_SET_H_

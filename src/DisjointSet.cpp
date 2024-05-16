@@ -15,10 +15,10 @@
 
 #include "DisjointSet.h"
 
-DisjSet::DisjSet(unsigned long const & n) 
+DisjSet::DisjSet(long int const & n) 
 {
    rank = new int[n];
-   parent = new unsigned long[n];
+   parent = new long int[n];
    this->n = n;
    make_set();
 }
@@ -26,13 +26,13 @@ DisjSet::DisjSet(unsigned long const & n)
 // Creates n single item sets
 void DisjSet::make_set()
 {
-   for (unsigned long i = 0; i < n; i++) {
+   for (long int i = 0; i < n; i++) {
       parent[i] = i;
    }
 }
 
 // Finds set of given item x
-unsigned long DisjSet::find(unsigned long const & x)
+long int DisjSet::find(long int const & x)
 {
    // Finds the representative of the set
    // that x is an element of
@@ -51,28 +51,28 @@ unsigned long DisjSet::find(unsigned long const & x)
    return parent[x];
 }
 
-void DisjSet::set_parent(unsigned long const & x, unsigned long const & new_parent)
+void DisjSet::set_parent(long int const & x, long int const & new_parent)
 {
    parent[x] = new_parent;
 }
 
-int DisjSet::get_rank(unsigned long const & x)
+int DisjSet::get_rank(long int const & x)
 {
    return rank[x];
 }
 
-void DisjSet::increase_rank(unsigned long const & x)
+void DisjSet::increase_rank(long int const & x)
 {
    rank[x] += 1;
 }
 
 // Do union of two sets by rank represented
 // by x and y.
-int DisjSet::set_union(unsigned long const & x, unsigned long const & y)
+int DisjSet::set_union(long int const & x, long int const & y)
 {
    // Find current sets of x and y
-   unsigned long xset = find(x);
-   unsigned long yset = find(y);
+   long int xset = find(x);
+   long int yset = find(y);
 
    // If they are already in same set
    if (xset == yset)
@@ -81,19 +81,50 @@ int DisjSet::set_union(unsigned long const & x, unsigned long const & y)
    // Put smaller ranked item under
    // bigger ranked item if ranks are
    // different
-   if (rank[xset] < rank[yset]) {
+   if (rank[xset] < rank[yset]) 
+   {
       parent[xset] = yset;
    }
-   else if (rank[xset] > rank[yset]) {
+   else if (rank[xset] > rank[yset]) 
+   {
       parent[yset] = xset;
    }
-
-   // If ranks are same, then increment
-   // rank.
-   else {
+   else 
+   {
+      // If ranks are same, then increment
+      // rank.
       parent[yset] = xset;
       rank[xset] = rank[xset] + 1;
    }
 
    return 0;
+}
+
+long int DisjSet::set_union_opt(long int const & root_set, 
+                                 long int const & candidate)
+{
+   long int ret_val = -1;
+   long int candidate_root = find(candidate);
+
+   if (root_set == candidate_root)
+      return ret_val;
+
+   if (rank[root_set] < rank[candidate_root]) 
+   {
+      parent[root_set] = candidate_root;
+      ret_val = candidate_root;
+   }
+   else if (rank[root_set] > rank[candidate_root])
+   {
+      parent[candidate_root] = root_set;
+      ret_val = root_set;
+   }
+   else 
+   {
+      parent[candidate_root] = root_set;
+      rank[root_set] = rank[root_set] + 1;
+      ret_val = root_set;
+   }
+
+   return ret_val;
 }

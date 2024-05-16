@@ -22,7 +22,8 @@ class UF:
         # Para hacer el segundo BP
         self._bpd2 = bp_decoder(
             H,
-            error_rate = p
+            error_rate = p,
+            #max_iter = 5
         )
         self.rows = H.shape[0]
         self.columns = H.shape[1]
@@ -41,6 +42,8 @@ class UF:
                     self.Hog[-2,i] = 1
                 else:
                     self.Hog[-1,i] = 1
+
+        self.index_array = np.array([i for i in range(0, self.columns)], dtype=np.uint64)
 
         # Definimos el número máximo de índices por columna
         max_nontrivial_per_col = np.max(np.sum(self.Hog == 1, axis=0))
@@ -129,7 +132,8 @@ class UF:
         return indices_columns_chosen
     
     def Kruskal_hypergraph_v2(self, sorted_indices: np.ndarray):
-        return bpbp.kruskal_on_hypergraph_v2(self.index_matrix, sorted_indices, self.rows+2)
+        return bpbp.kruskal_on_hypergraph_v2_uf(self.index_matrix, sorted_indices, self.rows+2, self.index_array)
+        #return bpbp.kruskal_on_hypergraph_v2_classical_uf(self.index_matrix, sorted_indices, self.rows+2, self.index_array)
                 
     def decode(self, syndrome : np.array):
         

@@ -5,7 +5,8 @@ INC_DIR			:= ./src
 PYBIND11_INC 	:= $(shell python3 -m pybind11 --includes)
 MOD_EXT_SUFIX	:= $(shell python3-config --extension-suffix)
 PY_LIBS			:= $(shell python3-config --ldflags)
-SRCS				:= src/koh_v2.cpp \
+SRCS				:= src/koh_v2_uf.cpp \
+						src/koh_v2_classical_uf.cpp \
 						src/DisjointSet.cpp \
 						src/py11_iface.cpp \
 
