@@ -5,8 +5,8 @@
 
 namespace py = pybind11;
 
-extern py::array_t<size_t> koh_v2(py::array_t<unsigned char, py::array::f_style> const & hog, 
-                                    py::array_t<float> const & llrs);
+extern py::array_t<size_t> koh_v2(py::array_t<ssize_t, py::array::f_style> const & hog, 
+                                    py::array_t<float> const & llrs, size_t const & orig_hog_rows);
 
 // Bindings for the bpbp module
 PYBIND11_MODULE(bpbp, bpbp) {

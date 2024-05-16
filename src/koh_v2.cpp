@@ -4,6 +4,7 @@
 #include <memory>
 #include <algorithm>
 #include <numeric>
+#include <span>
 
 #include <pybind11/pybind11.h>
 //#include <pybind11/stl.h>
@@ -35,6 +36,25 @@ inline py::array_t<typename Sequence::value_type> as_pyarray(Sequence &&seq) {
    seq_ptr.release();
 
    return py::array(size, data, capsule);
+}
+
+/**
+ * \brief Returns span<T> from py:array_T<T>. Efficient as zero-copy.
+ * \tparam T Type.
+ * \param passthrough Numpy array.
+ * \return Span<T> that with a clean and safe reference to contents of Numpy array.
+ */
+template<typename T>
+inline std::span<T> toSpan(py::array_t<T, py::array::f_style> const & passthrough)
+{
+	py::buffer_info passthroughBuf = passthrough.request();
+	if (passthroughBuf.ndim != 1) {
+		throw std::runtime_error("Error. Number of dimensions must be one");
+	}
+	size_t length = passthroughBuf.shape[0];
+	T* passthroughPtr = static_cast<T*>(passthroughBuf.ptr);
+	std::span<T> passthroughSpan(passthroughPtr, length);
+	return passthroughSpan;
 }
 
 template <typename T>
@@ -76,8 +96,8 @@ static std::vector<size_t> getRowNonZeroValues(std::vector<unsigned char> const 
    return nt_elem_col;
 }
 
-py::array_t<size_t> koh_v2(py::array_t<unsigned char, py::array::f_style> const & hog, 
-                           py::array_t<float> const & llrs)
+py::array_t<size_t> koh_v2(py::array_t<ssize_t, py::array::f_style> const & hog, 
+                           py::array_t<float> const & llrs, size_t const & orig_hog_rows)
 {
    const size_t hog_rows = hog.shape(0);
    const size_t hog_cols = hog.shape(1);
@@ -86,62 +106,70 @@ py::array_t<size_t> koh_v2(py::array_t<unsigned char, py::array::f_style> const 
    columns_chosen.reserve(hog_cols);
 
    std::vector<size_t> sorted_idxs = sort_indexes(llrs);
+   std::span<ssize_t> hog_sp = toSpan(hog);
 
-   DisjSet clstr_set = DisjSet(hog_rows+2);
+   DisjSet clstr_set = DisjSet(orig_hog_rows);
 
    for (size_t col_idx = 0UL; col_idx < sorted_idxs.size(); col_idx++)
    {
       size_t effective_col_idx = sorted_idxs.data()[col_idx];
       size_t col_offset = effective_col_idx * hog_rows;
-      std::vector<unsigned char> column(hog.data() + col_offset, hog.data() + col_offset + hog_rows);
+      std::vector<ssize_t> column(hog.data() + col_offset, hog.data() + col_offset + hog_rows);
+      std::span<ssize_t> column_sp(hog_sp + col_offset, hog_rows);
       
-      std::vector<unsigned char> checker(hog_rows+2, 0);
-      std::vector<int> depths = {0, -1, 0};
-      bool boolean_condition = true;
+      // std::vector<unsigned char> checker(orig_hog_rows, 0);
+      // std::vector<int> depths = {0, -1, 0};
+      // bool boolean_condition = true;
 
-      //std::vector<size_t> nt_elem_col = getRowNonZeroValues(column);
+      // for (size_t nt_elem_idx = 0UL; nt_elem_idx < column.size(); nt_elem_idx++)
+      // {
+      //    if (column[nt_elem_idx] == -1L)
+      //       break;
+      //    int elem_root = clstr_set.find(column[nt_elem_idx]);
+      //    int elem_depth = clstr_set.get_rank(elem_root);
 
-      for (size_t nt_elem_idx = 0UL; nt_elem_idx < column.size()/* nt_elem_col.size() */; nt_elem_idx++)
+      //    if (checker[elem_root] == 1_uc)
+      //    {
+      //       boolean_condition = false;
+      //       break;
+      //    }
+      //    checker[elem_root] = 1_uc;
+
+      //    if (elem_depth > depths[1])
+      //    {
+      //       depths = {elem_root, elem_depth, 0};
+      //    }
+      //    if (elem_depth == depths[1])
+      //    {
+      //       depths[2] = 1;
+      //    }
+      // }
+
+      // if (boolean_condition == true)
+      // {
+      //    for(size_t elem = 0UL; elem < checker.size(); elem++)
+      //    {
+      //       if (checker[elem] == 1_uc)
+      //          clstr_set.set_parent(elem, depths[0]);
+      //    }
+      //    columns_chosen.push_back(effective_col_idx);
+      //    if (depths[2] == 1)
+      //    {
+      //       clstr_set.increase_rank(depths[0]);
+      //    }
+      // }
+      int retcode = 0;
+      for (size_t nt_elem_idx = 1UL; nt_elem_idx < column.size(); nt_elem_idx++)
       {
-         if (column[nt_elem_idx] == 0_uc)
-            continue;
-         int elem_root = clstr_set.find(/* nt_elem_col[*/nt_elem_idx/* ] */);
-         int elem_depth = clstr_set.get_rank(elem_root);
-
-         if (checker[elem_root] == 1_uc)
-         {
-            boolean_condition = false;
+         if (column[nt_elem_idx] == -1L)
             break;
-         }
-         checker[elem_root] = 1_uc;
-
-         if (elem_depth > depths[1])
-         {
-            depths = {elem_root, elem_depth, 0_uc};
-         }
-         if (elem_depth == depths[1])
-         {
-            depths[2] = 1_uc;
-         }
+         
+         retcode = clstr_set.set_union(column[nt_elem_idx-1], column[nt_elem_idx]);
+         if (retcode == -1)
+            break;
       }
-
-      if (boolean_condition == true)
-      {
-         // std::vector<size_t> nt_checker = getRowNonZeroValues(checker);
-         // for (const auto & elem : nt_checker)
-         for(size_t elem = 0UL; elem < checker.size(); elem++)
-         {
-            if (checker[elem] == 1_uc)
-               clstr_set.set_parent(elem, depths[0]);
-         }
+      if (retcode == 0)
          columns_chosen.push_back(effective_col_idx);
-         if (depths[2] == 1_uc)
-         {
-            clstr_set.increase_rank(depths[0]);
-         }
-      }
-
-
    }
 
    return as_pyarray(std::move(columns_chosen));

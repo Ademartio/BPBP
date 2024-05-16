@@ -44,7 +44,7 @@ class DisjSet
 
       // Do union of two sets by rank represented 
       // by x and y. 
-      void set_union(unsigned long const & x, unsigned long const & y);
+      int set_union(unsigned long const & x, unsigned long const & y);
 };
 
 #endif // DISJOINT_SET_H_

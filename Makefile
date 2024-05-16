@@ -20,14 +20,14 @@ ifeq ($(OS),Windows_NT)
 else
 	CCFLAGS += -D Linux
 	STD = gnu++11
-	STD = c++14
+	STD = c++2a
 endif
 		
 
 
 bpbp_module: 
 	[ -d $(MODULE_DIR) ] || mkdir -p $(MODULE_DIR)
-	g++ -O3 -Wall -shared -std=${STD} ${CCFLAGS} -fPIC -I${INC_DIR} ${PYBIND11_INC} ${SRCS} -o ${MODULE_DIR}/${MODULE_NAME}${MOD_EXT_SUFIX} ${PY_LIBS}
+	g++-10 -O3 -Wall -shared -std=${STD} ${CCFLAGS} -fPIC -I${INC_DIR} ${PYBIND11_INC} ${SRCS} -o ${MODULE_DIR}/${MODULE_NAME}${MOD_EXT_SUFIX} ${PY_LIBS}
 	cp -r ${MODULE_DIR} ./reference
 
 clean:

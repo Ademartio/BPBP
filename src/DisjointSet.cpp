@@ -68,7 +68,7 @@ void DisjSet::increase_rank(unsigned long const & x)
 
 // Do union of two sets by rank represented
 // by x and y.
-void DisjSet::set_union(unsigned long const & x, unsigned long const & y)
+int DisjSet::set_union(unsigned long const & x, unsigned long const & y)
 {
    // Find current sets of x and y
    unsigned long xset = find(x);
@@ -76,7 +76,7 @@ void DisjSet::set_union(unsigned long const & x, unsigned long const & y)
 
    // If they are already in same set
    if (xset == yset)
-      return;
+      return -1;
 
    // Put smaller ranked item under
    // bigger ranked item if ranks are
@@ -94,4 +94,6 @@ void DisjSet::set_union(unsigned long const & x, unsigned long const & y)
       parent[yset] = xset;
       rank[xset] = rank[xset] + 1;
    }
+
+   return 0;
 }
