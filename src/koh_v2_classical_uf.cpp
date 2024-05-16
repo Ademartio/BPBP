@@ -14,11 +14,6 @@
 
 namespace py = pybind11;
 
-inline constexpr unsigned char operator "" _uc(unsigned long long arg) noexcept
-{
-   return static_cast<unsigned char>( arg );
-}
-
 // helper function to avoid making a copy when returning a py::array_t
 // author: https://github.com/YannickJadoul
 // source: https://github.com/pybind/pybind11/issues/1042#issuecomment-642215028

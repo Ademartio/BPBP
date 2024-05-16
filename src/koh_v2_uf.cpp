@@ -157,23 +157,6 @@ py::array_t<size_t> koh_v2_uf(py::array_t<ssize_t, py::array::f_style> const & h
             clstr_set.increase_rank(depths[0]);
          }
       }
-
-      // int retcode = 0;
-      // long int retcode = -1;
-      // long int root_set = clstr_set.find(column_sp[0]);
-      // for (size_t nt_elem_idx = 1UL; nt_elem_idx < column_sp.size(); nt_elem_idx++)
-      // {
-      //    if (column_sp[nt_elem_idx] == -1L)
-      //       break;
-
-      //    //retcode = clstr_set.set_union(column_sp[nt_elem_idx-1], column_sp[nt_elem_idx]);
-      //    retcode = clstr_set.set_union_uf(root_set, column_sp[nt_elem_idx]);
-      //    if (retcode == -1L)
-      //       break;
-      //    root_set = retcode;
-      // }
-      // if (retcode != -1L)
-      //    columns_chosen.push_back(effective_col_idx);
    }
 
    return as_pyarray(std::move(columns_chosen));
