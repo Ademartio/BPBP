@@ -8,12 +8,14 @@ namespace py = pybind11;
 extern py::array_t<size_t> koh_v2_uf(py::array_t<ssize_t, py::array::f_style> const & hog, 
                                        py::array_t<float> const & llrs, 
                                        size_t const & orig_hog_rows,
-                                       py::array_t<size_t, py::array::c_style> idxs);
+                                       py::array_t<size_t, py::array::c_style> idxs,
+                                       size_t const & rank);
 
 extern py::array_t<size_t> koh_v2_classical_uf(py::array_t<ssize_t, py::array::f_style> const & hog, 
                                                 py::array_t<float> const & llrs, 
                                                 size_t const & orig_hog_rows,
-                                                py::array_t<size_t, py::array::c_style> idxs);
+                                                py::array_t<size_t, py::array::c_style> idxs,
+                                                size_t const & rank);
 
 // Bindings for the bpbp module
 PYBIND11_MODULE(bpbp, bpbp) {

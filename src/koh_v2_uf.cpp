@@ -96,7 +96,8 @@ static void sort_indexes(py::array_t<T> const &v,
 py::array_t<size_t> koh_v2_uf(py::array_t<ssize_t, py::array::f_style> const & hog, 
                               py::array_t<float> const & llrs, 
                               size_t const & orig_hog_rows,
-                              py::array_t<size_t, py::array::c_style> idxs)
+                              py::array_t<size_t, py::array::c_style> idxs,
+                              size_t const & rank)
 {
    const size_t hog_rows = hog.shape(0);
    const size_t hog_cols = hog.shape(1);
@@ -156,6 +157,8 @@ py::array_t<size_t> koh_v2_uf(py::array_t<ssize_t, py::array::f_style> const & h
          {
             clstr_set.increase_rank(depths[0]);
          }
+         if (columns_chosen.size() == rank)
+            break;
       }
    }
 

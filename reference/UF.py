@@ -2,6 +2,7 @@ import numpy as np
 from ldpc import bp_decoder
 import copy
 import time
+import galois
 
 from module import bpbp
 
@@ -27,6 +28,8 @@ class UF:
         )
         self.rows = H.shape[0]
         self.columns = H.shape[1]
+        
+        self.rank = np.linalg.matrix_rank(H).astype(np.uint64)
         
         self.Hog = copy.deepcopy(self.H)
         
@@ -132,7 +135,7 @@ class UF:
         return indices_columns_chosen
     
     def Kruskal_hypergraph_v2(self, sorted_indices: np.ndarray):
-        return bpbp.kruskal_on_hypergraph_v2_uf(self.index_matrix, sorted_indices, self.rows+2, self.index_array)
+        return bpbp.kruskal_on_hypergraph_v2_uf(self.index_matrix, sorted_indices, self.rows+2, self.index_array, self.rank)
         #return bpbp.kruskal_on_hypergraph_v2_classical_uf(self.index_matrix, sorted_indices, self.rows+2, self.index_array)
                 
     def decode(self, syndrome : np.array):
